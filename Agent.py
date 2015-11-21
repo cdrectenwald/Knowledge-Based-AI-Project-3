@@ -12,6 +12,7 @@ import functools
 # noinspection PyMethodMayBeStatic
 class Agent:
     def __init__(self):
+        self.problem_name = None
         self.log_file = None
         self.figure_names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '1', '2', '3', '4', '5', '6', '7', '8']
         self.figure_pixel_matrix = {}
@@ -19,6 +20,7 @@ class Agent:
 
     def initialize(self, problem: RavensProblem):
         print(problem.name)
+        self.problem_name = problem.name
         folder_name = 'Problems/{}s {}/{}/'.format(problem.name.rsplit(' ', 1)[0], problem.name.split('-')[0].rsplit(' ', 1)[1], problem.name)
         for figure_name in self.figure_names:
             self.figure_pixel_matrix[figure_name] = self.open_image_return_pixels(Image.open('{}{}.png'.format(folder_name, figure_name)).convert('1'))
@@ -56,25 +58,43 @@ class Agent:
         width, height = image.size
         return [pixels[i * width:(i + 1) * width] for i in range(height)]
 
-    def unchanged(self):
-        unchanged_flag = 1
-        for combination in [['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], ['G', 'H']]:
-            if self.figure_similarity[combination[0]+combination[1]] < 95:
-                unchanged_flag = 0
+    def method_unchanged(self):
+        flag = 1
         best_answer = -1
         similarity_maximum = 0
-        if unchanged_flag == 1:
+        for combination in [['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], ['G', 'H']]:
+            if self.figure_similarity[combination[0]+combination[1]] < 95:
+                flag = 0
+        if flag == 1:
             for combination in [['H', '1'], ['H', '2'], ['H', '3'], ['H', '4'], ['H', '5'], ['H', '6'], ['H', '7'], ['H', '8']]:
-                if self.figure_similarity[combination[0]+combination[1]] > similarity_maximum:
+                this_similarity = self.figure_similarity[combination[0] + combination[1]]
+                if this_similarity > similarity_maximum:
                     best_answer = combination[1]
-                    similarity_maximum = self.figure_similarity[combination[0]+combination[1]]
+                    similarity_maximum = this_similarity
+        return best_answer
+
+    def method_simple_iterate(self):
+        best_answer = -1
+        similarity_maximum = 0
+        if self.calculate_figure_pixel_similarity(
+                self.figure_pixel_matrix_intersection(self.figure_pixel_matrix_intersection(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']),
+                self.figure_pixel_matrix_intersection(self.figure_pixel_matrix_intersection(self.figure_pixel_matrix['D'], self.figure_pixel_matrix['E']), self.figure_pixel_matrix['F'])) > 95:
+            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                this_similarity = self.calculate_figure_pixel_similarity(
+                        self.figure_pixel_matrix_intersection(self.figure_pixel_matrix_intersection(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']),
+                        self.figure_pixel_matrix_intersection(self.figure_pixel_matrix_intersection(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer]))
+                if this_similarity > similarity_maximum:
+                    best_answer = possible_answer
+                    similarity_maximum = this_similarity
         return best_answer
 
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        possible_answer = self.unchanged()
-        if possible_answer != -1:
-            return possible_answer
+        for possible_method in [self.method_unchanged, self.method_simple_iterate]:
+            possible_answer = possible_method()
+            if possible_answer != -1:
+                print(possible_method.__name__)
+                return possible_answer
         return -1
 
