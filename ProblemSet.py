@@ -39,7 +39,8 @@ class ProblemSet:
         r = open("Problems" + os.sep + self.name + os.sep + "ProblemList.txt")
         line = self.getNextLine(r)
         while not line=="":
-            self.loadProblem(line)
+            if not line.startswith("#"):
+                self.loadProblem(line)
             line=self.getNextLine(r)
 
     def loadProblem(self, problemName):
