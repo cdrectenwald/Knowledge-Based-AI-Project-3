@@ -7,6 +7,7 @@ from RavensObject import RavensObject
 import pprint
 import os
 import functools
+import statistics
 
 
 # noinspection PyMethodMayBeStatic
@@ -83,7 +84,7 @@ class Agent:
         best_answer = -1
         similarity_maximum = 0
         for combination in [['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], ['G', 'H']]:
-            if self.figure_similarity[combination[0]+combination[1]] < 95:
+            if self.figure_similarity[combination[0] + combination[1]] < 95:
                 flag = 0
         if flag == 1:
             for combination in [['H', '1'], ['H', '2'], ['H', '3'], ['H', '4'], ['H', '5'], ['H', '6'], ['H', '7'], ['H', '8']]:
@@ -93,7 +94,7 @@ class Agent:
                     similarity_maximum = this_similarity
         return best_answer
 
-    def method_simple_iterate(self):
+    def method_merge_row(self):
         best_answer = -1
         similarity_maximum = 0
         if self.calculate_figure_pixel_similarity(
@@ -101,11 +102,34 @@ class Agent:
                 self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['D'], self.figure_pixel_matrix['E']), self.figure_pixel_matrix['F'])) > 95:
             for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
                 this_similarity = self.calculate_figure_pixel_similarity(
-                        self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']),
-                        self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer]))
+                    self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']),
+                    self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer]))
                 if this_similarity > similarity_maximum:
                     best_answer = possible_answer
                     similarity_maximum = this_similarity
+        return best_answer
+
+    def method_simple_iterate(self):
+        possible_combinations = self.permutations(['A', 'B', 'C'], ['D', 'E', 'F'])
+        flag = 0
+        best_answer = -1
+        similarity_maximum = 0
+        for combination in possible_combinations:
+            overall_similarity = []
+            for key, value in combination.items():
+                overall_similarity.append(self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[key], self.figure_pixel_matrix[value]))
+            if statistics.mean(overall_similarity) > 95:
+                flag = 1
+        if flag == 1:
+            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                possible_combinations = self.permutations(['A', 'B', 'C'], ['G', 'H', possible_answer])
+                for combination in possible_combinations:
+                    overall_similarity = []
+                    for key, value in combination.items():
+                        overall_similarity.append(self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[key], self.figure_pixel_matrix[value]))
+                    if statistics.mean(overall_similarity) > similarity_maximum and statistics.mean(overall_similarity) > 95:
+                        best_answer = possible_answer
+                        similarity_maximum = statistics.mean(overall_similarity)
         return best_answer
 
     def method_merge_two_to_get_third(self):
@@ -122,10 +146,14 @@ class Agent:
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.method_merge_two_to_get_third, self.method_simple_iterate]:
+        for possible_method in [self.method_unchanged, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)
                 return possible_answer
         return -1
 
+    def permutations(self, former_objects, later_objects):
+        return [dict(zip(a, later_objects)) for a in itertools.permutations(former_objects, len(later_objects))] if \
+            len(former_objects) > len(later_objects) else \
+            [dict(zip(former_objects, b)) for b in itertools.permutations(later_objects, len(former_objects))]
