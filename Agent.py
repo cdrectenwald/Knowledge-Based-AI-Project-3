@@ -19,16 +19,16 @@ class Agent:
         self.figure_names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '1', '2', '3', '4', '5', '6', '7', '8']
         self.figure_pixel_matrix = {}
         self.figure_similarity = {}
-        self.figure_number_of_objects = {}
+        self.figure_objects = None
         self.islands = Islands()
 
     def initialize(self, problem: RavensProblem):
+        self.figure_objects = {}
         print(problem.name)
         self.problem_name = problem.name
         folder_name = 'Problems/{}s {}/{}/'.format(problem.name.rsplit(' ', 1)[0], problem.name.split('-')[0].rsplit(' ', 1)[1], problem.name)
         for figure_name in self.figure_names:
             self.figure_pixel_matrix[figure_name] = self.open_image_return_pixels(Image.open('{}{}.png'.format(folder_name, figure_name)).convert('1'))
-            self.figure_number_of_objects[figure_name] = self.islands.get_number_of_islands(self.figure_pixel_matrix[figure_name])
         for combination in [['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], ['G', 'H'], ['H', '1'], ['H', '2'], ['H', '3'], ['H', '4'], ['H', '5'], ['H', '6'], ['H', '7'], ['H', '8']]:
             self.figure_similarity[combination[0] + combination[1]] = self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[combination[0]], self.figure_pixel_matrix[combination[1]])
         # print(self.figure_number_of_objects)
@@ -87,6 +87,11 @@ class Agent:
                 else:
                     return_matrix[row][column] = 0
         return return_matrix
+
+    def parse_objects_in_figures(self):
+        for figure_name in self.figure_names:
+            self.figure_objects[figure_name] = self.islands.get_number_of_islands(self.figure_pixel_matrix[figure_name])
+        return -1
 
     def open_image_return_pixels(self, image: Image.Image):
         pixels = list(image.getdata())
@@ -188,7 +193,7 @@ class Agent:
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third, self.method_xor_two_to_get_third]:
+        for possible_method in [self.method_unchanged, self.method_xor_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third, self.parse_objects_in_figures]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)

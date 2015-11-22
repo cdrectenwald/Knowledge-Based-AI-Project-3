@@ -8,5 +8,5 @@ Basic Problem D-07
 Basic Problem D-08
 #Basic Problem D-09 incorrect method_merge_row
 #Basic Problem D-10 correct method_merge_row
-#Basic Problem D-11 correct method_merge_two_to_get_third
+#Basic Problem D-11 correct
 Basic Problem D-12
