@@ -6,6 +6,7 @@ from RavensFigure import RavensFigure
 from RavensObject import RavensObject
 import pprint
 import os
+from NumberOfIslands import Islands
 import functools
 import statistics
 
@@ -18,6 +19,8 @@ class Agent:
         self.figure_names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '1', '2', '3', '4', '5', '6', '7', '8']
         self.figure_pixel_matrix = {}
         self.figure_similarity = {}
+        self.figure_number_of_objects = {}
+        self.islands = Islands()
 
     def initialize(self, problem: RavensProblem):
         print(problem.name)
@@ -25,9 +28,10 @@ class Agent:
         folder_name = 'Problems/{}s {}/{}/'.format(problem.name.rsplit(' ', 1)[0], problem.name.split('-')[0].rsplit(' ', 1)[1], problem.name)
         for figure_name in self.figure_names:
             self.figure_pixel_matrix[figure_name] = self.open_image_return_pixels(Image.open('{}{}.png'.format(folder_name, figure_name)).convert('1'))
+            self.figure_number_of_objects[figure_name] = self.islands.get_number_of_islands(self.figure_pixel_matrix[figure_name])
         for combination in [['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], ['G', 'H'], ['H', '1'], ['H', '2'], ['H', '3'], ['H', '4'], ['H', '5'], ['H', '6'], ['H', '7'], ['H', '8']]:
-            self.figure_similarity[combination[0]+combination[1]] = self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[combination[0]], self.figure_pixel_matrix[combination[1]])
-        pass
+            self.figure_similarity[combination[0] + combination[1]] = self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[combination[0]], self.figure_pixel_matrix[combination[1]])
+        # print(self.figure_number_of_objects)
 
     def calculate_figure_pixel_similarity(self, pixel_matrix_a, pixel_matrix_b):
         intersection = functools.reduce(lambda x, y: x + y, self.figure_pixel_matrix_white_intersection(pixel_matrix_a, pixel_matrix_b)).count(255)
