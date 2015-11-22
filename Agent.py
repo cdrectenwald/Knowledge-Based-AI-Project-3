@@ -211,19 +211,23 @@ class Agent:
         most_likely = min(similarity_of_combination.items(), key=lambda x: x[1])
         if most_likely[1] < 0.2:
             similarity_of_combination = {}
-            if ('A', 'D') in most_likely[0] and ('B', 'E') in most_likely[0] and ('C', 'F') in most_likely[0]:
-                for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                if ('A', 'D') in most_likely[0] and ('B', 'E') in most_likely[0] and ('C', 'F') in most_likely[0]:
                     combination = {'A': 'G', 'B': 'H', 'C': possible_answer}
-                    area_difference = []
-                    correspondence = list(combination.items())
-                    area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[1][0]),
-                                                                         self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[1][1])))
-                    area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[1][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
-                                                                         self.calculate_sum_of_area_in_figure(correspondence[1][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
-                    area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
-                                                                         self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
-                    similarity_of_combination[possible_answer] = statistics.mean(area_difference)
-                return min(similarity_of_combination.items(), key=lambda x: x[1])[0]
+                elif ('A', 'E') in most_likely[0] and ('B', 'F') in most_likely[0] and ('C', 'D') in most_likely[0]:
+                    combination = {'A': possible_answer, 'B': 'G', 'C': 'H'}
+                else:
+                    return -1
+                area_difference = []
+                correspondence = list(combination.items())
+                area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[1][0]),
+                                                                     self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[1][1])))
+                area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[1][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
+                                                                     self.calculate_sum_of_area_in_figure(correspondence[1][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
+                area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
+                                                                     self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
+                similarity_of_combination[possible_answer] = statistics.mean(area_difference)
+            return min(similarity_of_combination.items(), key=lambda x: x[1])[0]
         return -1
 
     def similarity_of_two_number(self, number_1, number_2):
