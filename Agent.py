@@ -30,8 +30,8 @@ class Agent:
         pass
 
     def calculate_figure_pixel_similarity(self, pixel_matrix_a, pixel_matrix_b):
-        intersection = functools.reduce(lambda x, y: x+y, self.figure_pixel_matrix_white_intersection(pixel_matrix_a, pixel_matrix_b)).count(255)
-        union = functools.reduce(lambda x, y: x+y, self.figure_pixel_matrix_white_union(pixel_matrix_a, pixel_matrix_b)).count(255)
+        intersection = functools.reduce(lambda x, y: x + y, self.figure_pixel_matrix_white_intersection(pixel_matrix_a, pixel_matrix_b)).count(255)
+        union = functools.reduce(lambda x, y: x + y, self.figure_pixel_matrix_white_union(pixel_matrix_a, pixel_matrix_b)).count(255)
         return intersection / union * 100
 
     def figure_pixel_matrix_white_union(self, pixel_matrix_a, pixel_matrix_b):
@@ -135,12 +135,16 @@ class Agent:
     def method_merge_two_to_get_third(self):
         best_answer = -1
         similarity_maximum = 0
-        if self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_union(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']) > 95:
-            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
-                this_similarity = self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_union(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer])
-                if this_similarity > similarity_maximum:
-                    best_answer = possible_answer
-                    similarity_maximum = this_similarity
+        possible_combinations = list(itertools.permutations('012', 3))
+        imitation = ['A', 'B', 'C']
+        for combination in possible_combinations:
+            if self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_union(self.figure_pixel_matrix[imitation[int(combination[0])]], self.figure_pixel_matrix[imitation[int(combination[1])]]), self.figure_pixel_matrix[imitation[int(combination[2])]]) > 95:
+                for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                    reproduce = ['G', 'H', possible_answer]
+                    this_similarity = self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_union(self.figure_pixel_matrix[reproduce[int(combination[0])]], self.figure_pixel_matrix[reproduce[int(combination[1])]]), self.figure_pixel_matrix[reproduce[int(combination[2])]])
+                    if this_similarity > similarity_maximum:
+                        best_answer = possible_answer
+                        similarity_maximum = this_similarity
         return best_answer
 
     # noinspection PyPep8Naming
