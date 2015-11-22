@@ -19,7 +19,7 @@ class Agent:
         self.figure_names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '1', '2', '3', '4', '5', '6', '7', '8']
         self.figure_pixel_matrix = {}
         self.figure_similarity = {}
-        self.figure_objects = None
+        self.figure_objects = {}
         self.islands = Islands()
 
     def initialize(self, problem: RavensProblem):
@@ -190,10 +190,57 @@ class Agent:
                         similarity_maximum = this_similarity
         return best_answer
 
+    def method_change_of_area_to_get_third(self):
+        best_answer = -1
+        similarity_maximum = 0
+        first_row = ['A', 'B', 'C']
+        second_row = ['D', 'E', 'F']
+        possible_combinations = self.permutations(first_row, second_row)
+        print(possible_combinations)
+        similarity_of_combination = {}
+        for combination in possible_combinations:
+            area_difference = []
+            correspondence = list(combination.items())
+            area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[1][0]),
+                                                                 self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[1][1])))
+            area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[1][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
+                                                                 self.calculate_sum_of_area_in_figure(correspondence[1][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
+            area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
+                                                                 self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
+            similarity_of_combination[frozenset(combination.items())] = statistics.mean(area_difference)
+        most_likely = min(similarity_of_combination.items(), key=lambda x: x[1])
+        if most_likely[1] < 0.2:
+            similarity_of_combination = {}
+            if ('A', 'D') in most_likely[0] and ('B', 'E') in most_likely[0] and ('C', 'F') in most_likely[0]:
+                for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                    combination = {'A': 'G', 'B': 'H', 'C': possible_answer}
+                    area_difference = []
+                    correspondence = list(combination.items())
+                    area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[1][0]),
+                                                                         self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[1][1])))
+                    area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[1][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
+                                                                         self.calculate_sum_of_area_in_figure(correspondence[1][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
+                    area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure(correspondence[0][0]) - self.calculate_sum_of_area_in_figure(correspondence[2][0]),
+                                                                         self.calculate_sum_of_area_in_figure(correspondence[0][1]) - self.calculate_sum_of_area_in_figure(correspondence[2][1])))
+                    similarity_of_combination[possible_answer] = statistics.mean(area_difference)
+                return min(similarity_of_combination.items(), key=lambda x: x[1])[0]
+        return -1
+
+    def similarity_of_two_number(self, number_1, number_2):
+        number_1 = abs(number_1)
+        number_2 = abs(number_2)
+        return abs(number_1 - number_2) / ((number_1 + number_2) / 2)
+
+    def calculate_sum_of_area_in_figure(self, figure_name):
+        sum_of_area = 0
+        for index, figure_object in self.figure_objects[figure_name].items():
+            sum_of_area += figure_object['area']
+        return sum_of_area
+
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.method_xor_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third, self.parse_objects_in_figures]:
+        for possible_method in [self.method_unchanged, self.method_xor_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third, self.parse_objects_in_figures, self.method_change_of_area_to_get_third]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)
