@@ -181,6 +181,8 @@ class Agent:
     def method_xor_two_to_get_third(self):
         best_answer = -1
         similarity_maximum = 0
+        if len(self.figure_objects['A']) + len(self.figure_objects['B']) == len(self.figure_objects['C']) and len(self.figure_objects['D']) + len(self.figure_objects['E']) == len(self.figure_objects['F']):
+            return -1
         if self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_xor(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']) > 97 \
                 and self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_xor(self.figure_pixel_matrix['D'], self.figure_pixel_matrix['E']), self.figure_pixel_matrix['F']) > 97:
             for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
@@ -196,7 +198,6 @@ class Agent:
         first_row = ['A', 'B', 'C']
         second_row = ['D', 'E', 'F']
         possible_combinations = self.permutations(first_row, second_row)
-        print(possible_combinations)
         similarity_of_combination = {}
         for combination in possible_combinations:
             area_difference = []
@@ -230,6 +231,18 @@ class Agent:
             return min(similarity_of_combination.items(), key=lambda x: x[1])[0]
         return -1
 
+    def method_simpler_change_of_area_to_get_third(self):
+        area_difference = []
+        area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('A') - self.calculate_sum_of_area_in_figure('B'), self.calculate_sum_of_area_in_figure('C')))
+        area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('D') - self.calculate_sum_of_area_in_figure('E'), self.calculate_sum_of_area_in_figure('F')))
+        similarity_of_answer = {}
+        if statistics.mean(area_difference) < 0.1:
+            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                similarity_of_answer[possible_answer] = self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('G') - self.calculate_sum_of_area_in_figure('H'), self.calculate_sum_of_area_in_figure(possible_answer))
+            if min(similarity_of_answer.items(), key=lambda x: x[1])[1] < 0.1:
+                return min(similarity_of_answer.items(), key=lambda x: x[1])[0]
+        return -1
+
     def similarity_of_two_number(self, number_1, number_2):
         number_1 = abs(number_1)
         number_2 = abs(number_2)
@@ -244,7 +257,7 @@ class Agent:
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.method_xor_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third, self.parse_objects_in_figures, self.method_change_of_area_to_get_third]:
+        for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)
