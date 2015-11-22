@@ -68,6 +68,16 @@ class Agent:
                     return_matrix[row][column] = 255
         return return_matrix
 
+    def figure_pixel_matrix_black_xor(self, pixel_matrix_a, pixel_matrix_b):
+        return_matrix = [[0 for i in range(len(pixel_matrix_a[0]))] for j in range(len(pixel_matrix_a))]
+        for row, (a_row, b_row) in enumerate(zip(pixel_matrix_a, pixel_matrix_b)):
+            for column, (a_row_column, b_row_column) in enumerate(zip(a_row, b_row)):
+                if a_row_column != b_row_column:
+                    return_matrix[row][column] = 0
+                else:
+                    return_matrix[row][column] = 255
+        return return_matrix
+
     def figure_pixel_matrix_white_intersection(self, pixel_matrix_a, pixel_matrix_b):
         return_matrix = [[0 for i in range(len(pixel_matrix_a[0]))] for j in range(len(pixel_matrix_a))]
         for row, (a_row, b_row) in enumerate(zip(pixel_matrix_a, pixel_matrix_b)):
@@ -162,12 +172,23 @@ class Agent:
                         best_answer = possible_answer
                         similarity_maximum = this_similarity
         return best_answer
-        pass
+
+    def method_xor_two_to_get_third(self):
+        best_answer = -1
+        similarity_maximum = 0
+        if self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_xor(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']) > 97 \
+                and self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_xor(self.figure_pixel_matrix['D'], self.figure_pixel_matrix['E']), self.figure_pixel_matrix['F']) > 97:
+            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                    this_similarity = self.calculate_figure_pixel_similarity(self.figure_pixel_matrix_black_xor(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer])
+                    if this_similarity > similarity_maximum:
+                        best_answer = possible_answer
+                        similarity_maximum = this_similarity
+        return best_answer
 
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third]:
+        for possible_method in [self.method_unchanged, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_and_two_to_get_third, self.method_xor_two_to_get_third]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)

@@ -4,7 +4,7 @@
 Basic Problem E-04
 #Basic Problem E-05 incorrect method_merge_two_to_get_third
 #Basic Problem E-06 correct method_merge_two_to_get_third
-Basic Problem E-07
+#Basic Problem E-07 correct method_xor_two_to_get_third
 #Basic Problem E-08 correct method_merge_two_to_get_third
 #Basic Problem E-09 correct method_merge_two_to_get_third
 #Basic Problem E-10 correct method_and_two_to_get_third
