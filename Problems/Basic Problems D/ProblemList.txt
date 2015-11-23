@@ -10,7 +10,7 @@
 #correct method_change_of_area_to_get_third
 #Basic Problem D-06
 #correct method_change_of_area_to_get_third
-Basic Problem D-07
+#Basic Problem D-07
 Basic Problem D-08
 Basic Problem D-09
 #incorrect method_merge_row

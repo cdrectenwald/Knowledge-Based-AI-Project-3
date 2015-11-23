@@ -91,6 +91,35 @@ class Agent:
     def parse_objects_in_figures(self):
         for figure_name in self.figure_names:
             self.figure_objects[figure_name] = self.islands.get_number_of_islands(self.figure_pixel_matrix[figure_name])
+            for key, this_object in self.figure_objects[figure_name].items():
+                center_x = int((this_object['left'] + this_object['right']) / 2)
+                center_y = int((this_object['up'] + this_object['down']) / 2)
+                if (center_x, center_y) in this_object['pixel_location']:
+                    this_object['fill'] = 'yes'
+                else:
+                    this_object['fill'] = 'no'
+                status_of_center = 0 if this_object['fill'] == 'yes' else 255
+                current_x = center_x
+                current_y = center_y
+                while True:
+                    current_x += 1
+                    if (this_object['fill'] == 'no' and (current_x, current_y) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_x][current_y] != status_of_center) \
+                            or (this_object['fill'] == 'yes' and (current_x, current_y) not in this_object['pixel_location']):
+                        break
+                    current_y += 1
+                    if (this_object['fill'] == 'no' and (current_x, current_y) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_x][current_y] != status_of_center) \
+                            or (this_object['fill'] == 'yes' and (current_x, current_y) not in this_object['pixel_location']):
+                        break
+                r = (this_object['right'] - this_object['left']) / 2
+                if 0.4 < (current_x - center_x) / r < 0.6:
+                    this_object['shape'] = 'diamond'
+                elif 0.6 <= (current_x - center_x) / r <= 0.8:
+                    this_object['shape'] = 'circle'
+                elif 0.9 < (current_x - center_x) / r < 1.1:
+                    this_object['shape'] = 'square'
+                else:
+                    this_object['shape'] = 'unknown'
+            pass
         return -1
 
     def open_image_return_pixels(self, image: Image.Image):
@@ -275,10 +304,26 @@ class Agent:
                         best_answer = key
         return best_answer
 
+    def method_ugly_number_of_objects(self):
+        number_of_objects_diagonal_1 = 0
+        number_of_objects_diagonal_2 = 0
+        number_of_objects_diagonal_3 = 0
+        if len(self.figure_objects['A']) == len(self.figure_objects['E']):
+            number_of_objects_diagonal_1 = len(self.figure_objects['A'])
+            if len(self.figure_objects['C']) == len(self.figure_objects['D']) == len(self.figure_objects['H']):
+                number_of_objects_diagonal_2 = len(self.figure_objects['C'])
+                if len(self.figure_objects['B']) == len(self.figure_objects['F']) == len(self.figure_objects['G']):
+                    number_of_objects_diagonal_3 = len(self.figure_objects['B'])
+        if not (number_of_objects_diagonal_1 == number_of_objects_diagonal_2 == number_of_objects_diagonal_3) and number_of_objects_diagonal_1 != 0 and number_of_objects_diagonal_2 != 0 and number_of_objects_diagonal_3 != 0:
+            for possible_answer in [x for x in ['1', '2', '3', '4', '5', '6', '7', '8'] if len(self.figure_objects[x]) == number_of_objects_diagonal_1]:
+                pass
+        else:
+            return -1
+
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third, self.method_special_case_in_change_of_area]:
+        for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third, self.method_special_case_in_change_of_area, self.method_ugly_number_of_objects]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)
