@@ -23,8 +23,6 @@ class Agent:
         self.islands = Islands()
 
     def initialize(self, problem: RavensProblem):
-        if 'C-' in problem.name or 'B-' in problem.name:
-            return -1
         self.figure_objects = {}
         print(problem.name)
         self.problem_name = problem.name
@@ -144,7 +142,7 @@ class Agent:
         best_answer = -1
         similarity_maximum = 0
         for combination in [['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], ['G', 'H']]:
-            if self.figure_similarity[combination[0] + combination[1]] < 95:
+            if self.figure_similarity[combination[0] + combination[1]] < 98:
                 flag = 0
         if flag == 1:
             for combination in [['H', '1'], ['H', '2'], ['H', '3'], ['H', '4'], ['H', '5'], ['H', '6'], ['H', '7'], ['H', '8']]:
@@ -186,7 +184,7 @@ class Agent:
             overall_similarity = []
             for key, value in combination.items():
                 overall_similarity.append(self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[key], self.figure_pixel_matrix[value]))
-            if statistics.mean(overall_similarity) > 95:
+            if statistics.mean(overall_similarity) > 98:
                 flag = 1
         if flag == 1:
             for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
@@ -195,7 +193,7 @@ class Agent:
                     overall_similarity = []
                     for key, value in combination.items():
                         overall_similarity.append(self.calculate_figure_pixel_similarity(self.figure_pixel_matrix[key], self.figure_pixel_matrix[value]))
-                    if statistics.mean(overall_similarity) > similarity_maximum and statistics.mean(overall_similarity) > 95:
+                    if statistics.mean(overall_similarity) > similarity_maximum and statistics.mean(overall_similarity) > 98:
                         best_answer = possible_answer
                         similarity_maximum = statistics.mean(overall_similarity)
         return best_answer
@@ -364,6 +362,8 @@ class Agent:
 
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
+        if 'C-' in problem.name or 'B-' in problem.name:
+            return -1
         self.initialize(problem)
         for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third, self.method_special_case_in_change_of_area, self.method_ugly_number_of_objects]:
             possible_answer = possible_method()

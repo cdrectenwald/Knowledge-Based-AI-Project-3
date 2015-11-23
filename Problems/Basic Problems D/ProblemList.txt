@@ -1,21 +1,12 @@
-#Basic Problem D-01
-#correct method_unchanged
-#Basic Problem D-02
-#correct method_simple_iterate
-#Basic Problem D-03
-#correct method_simple_iterate
-#Basic Problem D-04
-#correct method_change_of_area_to_get_third
-#Basic Problem D-05
-#correct method_change_of_area_to_get_third
-#Basic Problem D-06
-#correct method_change_of_area_to_get_third
-#Basic Problem D-07
+Basic Problem D-01
+Basic Problem D-02
+Basic Problem D-03
+Basic Problem D-04
+Basic Problem D-05
+Basic Problem D-06
+Basic Problem D-07
 Basic Problem D-08
 Basic Problem D-09
-#incorrect method_merge_row
-#Basic Problem D-10
-#correct method_merge_row
-#Basic Problem D-11
-#correct
+Basic Problem D-10
+Basic Problem D-11
 Basic Problem D-12
