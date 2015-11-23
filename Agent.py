@@ -94,7 +94,7 @@ class Agent:
             for key, this_object in self.figure_objects[figure_name].items():
                 center_x = int((this_object['left'] + this_object['right']) / 2)
                 center_y = int((this_object['up'] + this_object['down']) / 2)
-                if (center_x, center_y) in this_object['pixel_location']:
+                if (center_y, center_x) in this_object['pixel_location']:
                     this_object['fill'] = 'yes'
                 else:
                     this_object['fill'] = 'no'
@@ -103,23 +103,22 @@ class Agent:
                 current_y = center_y
                 while True:
                     current_x += 1
-                    if (this_object['fill'] == 'no' and (current_x, current_y) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_x][current_y] != status_of_center) \
-                            or (this_object['fill'] == 'yes' and (current_x, current_y) not in this_object['pixel_location']):
+                    if (this_object['fill'] == 'no' and (current_y, current_x) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_y][current_x] != status_of_center) \
+                            or (this_object['fill'] == 'yes' and (current_y, current_x) not in this_object['pixel_location']):
                         break
                     current_y += 1
-                    if (this_object['fill'] == 'no' and (current_x, current_y) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_x][current_y] != status_of_center) \
-                            or (this_object['fill'] == 'yes' and (current_x, current_y) not in this_object['pixel_location']):
+                    if (this_object['fill'] == 'no' and (current_y, current_x) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_y][current_x] != status_of_center) \
+                            or (this_object['fill'] == 'yes' and (current_y, current_x) not in this_object['pixel_location']):
                         break
                 r = (this_object['right'] - this_object['left']) / 2
                 if 0.4 < (current_x - center_x) / r < 0.6:
                     this_object['shape'] = 'diamond'
                 elif 0.6 <= (current_x - center_x) / r <= 0.8:
                     this_object['shape'] = 'circle'
-                elif 0.9 < (current_x - center_x) / r < 1.1:
+                elif 0.9 < (current_x - center_x) / r < 1.2:
                     this_object['shape'] = 'square'
                 else:
                     this_object['shape'] = 'unknown'
-            pass
         return -1
 
     def open_image_return_pixels(self, image: Image.Image):
