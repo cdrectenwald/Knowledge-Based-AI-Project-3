@@ -286,7 +286,20 @@ class Agent:
         if statistics.mean(area_difference) < 0.1:
             for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
                 similarity_of_answer[possible_answer] = self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('G') - self.calculate_sum_of_area_in_figure('H'), self.calculate_sum_of_area_in_figure(possible_answer))
-            if min(similarity_of_answer.items(), key=lambda x: x[1])[1] < 0.1:
+            filtered_answer = {k: v for k, v in similarity_of_answer.items() if v < 0.1}
+            if len(filtered_answer) > 1:
+                change_of_length = {}
+                for possible_answer, dumb in filtered_answer.items():
+                    left_most = 184
+                    right_most = 0
+                    for index, this_object in self.figure_objects[possible_answer].items():
+                        if this_object['left'] < left_most:
+                            left_most = this_object['left']
+                        if this_object['right'] > right_most:
+                            right_most = this_object['right']
+                    change_of_length[possible_answer] = right_most - left_most
+                return min(change_of_length.items(), key=lambda x: x[1])[0]
+            if len(similarity_of_answer) != 0 and min(similarity_of_answer.items(), key=lambda x: x[1])[1] < 0.1:
                 return min(similarity_of_answer.items(), key=lambda x: x[1])[0]
         return -1
 
