@@ -254,10 +254,31 @@ class Agent:
             sum_of_area += figure_object['area']
         return sum_of_area
 
+    def method_special_case_in_change_of_area(self):
+        best_answer = -1
+        if self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('A') - self.calculate_sum_of_area_in_figure('E'),
+                                         self.calculate_sum_of_area_in_figure('F') - self.calculate_sum_of_area_in_figure('G')) < 0.15:
+            similarity_of_combination = {}
+            for possible_answer in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                area_difference = []
+                area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('E') - self.calculate_sum_of_area_in_figure(possible_answer),
+                                                                     self.calculate_sum_of_area_in_figure('G') - self.calculate_sum_of_area_in_figure('B')))
+                area_difference.append(self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('A') - self.calculate_sum_of_area_in_figure(possible_answer),
+                                                                     self.calculate_sum_of_area_in_figure('F') - self.calculate_sum_of_area_in_figure('B')))
+                similarity_of_combination[possible_answer] = statistics.mean(area_difference)
+            filtered_similarity_of_combination = {k: v for (k, v) in similarity_of_combination.items() if v < 0.1}
+            if len(filtered_similarity_of_combination) != 0:
+                if len(self.figure_objects['A']) == len(self.figure_objects['E']):
+                    similar_number_of_objects_filtered_of_combination = {k: v for (k, v) in filtered_similarity_of_combination.items() if len(self.figure_objects[k]) == len(self.figure_objects['E'])}
+                    if len(similar_number_of_objects_filtered_of_combination) == 1:
+                        key, value = similar_number_of_objects_filtered_of_combination.popitem()
+                        best_answer = key
+        return best_answer
+
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
         self.initialize(problem)
-        for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third]:
+        for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third, self.method_special_case_in_change_of_area]:
             possible_answer = possible_method()
             if possible_answer != -1:
                 print(possible_method.__name__)
