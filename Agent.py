@@ -315,8 +315,18 @@ class Agent:
                 if len(self.figure_objects['B']) == len(self.figure_objects['F']) == len(self.figure_objects['G']):
                     number_of_objects_diagonal_3 = len(self.figure_objects['B'])
         if not (number_of_objects_diagonal_1 == number_of_objects_diagonal_2 == number_of_objects_diagonal_3) and number_of_objects_diagonal_1 != 0 and number_of_objects_diagonal_2 != 0 and number_of_objects_diagonal_3 != 0:
+            same_shape = []
             for possible_answer in [x for x in ['1', '2', '3', '4', '5', '6', '7', '8'] if len(self.figure_objects[x]) == number_of_objects_diagonal_1]:
-                pass
+                if self.figure_objects['A']['0']['shape'] != self.figure_objects['E']['0']['shape']:
+                    if self.figure_objects[possible_answer]['0']['shape'] != self.figure_objects['A']['0']['shape'] and self.figure_objects[possible_answer]['0']['shape'] != self.figure_objects['E']['0']['shape'] and self.figure_objects[possible_answer]['0']['fill'] == self.figure_objects['A']['0']['fill']:
+                        same_shape.append(possible_answer)
+            if len(same_shape) == 1:
+                return same_shape[0]
+            else:
+                r_difference = {}
+                for possible_answer in same_shape:
+                    r_difference[possible_answer] = abs((self.figure_objects['B']['0']['right'] - self.figure_objects['B']['0']['left']) - (self.figure_objects[possible_answer]['0']['right'] - self.figure_objects[possible_answer]['0']['left']))
+                return min(r_difference.items(), key=lambda x: x[1])[0]
         else:
             return -1
 
