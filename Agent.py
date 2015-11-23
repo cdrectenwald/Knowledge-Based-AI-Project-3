@@ -148,7 +148,7 @@ class Agent:
 
     def method_merge_row(self):
         best_answer = -1
-        similarity_maximum = 0
+        maybe_answers = {}
         if self.calculate_figure_pixel_similarity(
                 self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']),
                 self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['D'], self.figure_pixel_matrix['E']), self.figure_pixel_matrix['F'])) > 95:
@@ -156,9 +156,15 @@ class Agent:
                 this_similarity = self.calculate_figure_pixel_similarity(
                     self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['A'], self.figure_pixel_matrix['B']), self.figure_pixel_matrix['C']),
                     self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer]))
-                if this_similarity > similarity_maximum:
-                    best_answer = possible_answer
-                    similarity_maximum = this_similarity
+                if this_similarity > 96.5:
+                    maybe_answers[possible_answer] = this_similarity
+            if len(maybe_answers) == 1:
+                best_answer, dumb = maybe_answers.popitem()
+            elif len(maybe_answers) > 1:
+                similarity_xor = {}
+                for key, value in maybe_answers.items():
+                    similarity_xor[key] = self.calculate_black_area_in_figure(self.figure_pixel_matrix_black_xor(self.figure_pixel_matrix[key], self.figure_pixel_matrix['E']))
+                return min(similarity_xor.items(), key=lambda x: x[1])[0]
         return best_answer
 
     def method_simple_iterate(self):
@@ -280,6 +286,9 @@ class Agent:
         number_1 = abs(number_1)
         number_2 = abs(number_2)
         return abs(number_1 - number_2) / ((number_1 + number_2) / 2)
+
+    def calculate_black_area_in_figure(self, matrix):
+        return functools.reduce(lambda x, y: x + y, matrix).count(0)
 
     def calculate_sum_of_area_in_figure(self, figure_name):
         sum_of_area = 0
