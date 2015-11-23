@@ -164,7 +164,7 @@ class Agent:
                     self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix_white_intersection(self.figure_pixel_matrix['G'], self.figure_pixel_matrix['H']), self.figure_pixel_matrix[possible_answer]))
                 if this_similarity > 97.5:
                     maybe_answers[possible_answer] = this_similarity
-            if max(maybe_answers.items(), key=lambda x: x[1])[1] > 99:
+            if len(maybe_answers) != 0 and max(maybe_answers.items(), key=lambda x: x[1])[1] > 99:
                 return max(maybe_answers.items(), key=lambda x: x[1])[0]
             if len(maybe_answers) == 1:
                 best_answer, dumb = maybe_answers.popitem()
@@ -293,6 +293,8 @@ class Agent:
     def similarity_of_two_number(self, number_1, number_2):
         number_1 = abs(number_1)
         number_2 = abs(number_2)
+        if number_1 + number_2 == 0:
+            return 0
         return abs(number_1 - number_2) / ((number_1 + number_2) / 2)
 
     def calculate_black_area_in_figure(self, matrix):
@@ -356,13 +358,16 @@ class Agent:
                 r_difference = {}
                 for possible_answer in same_shape:
                     r_difference[possible_answer] = abs((self.figure_objects['B']['0']['right'] - self.figure_objects['B']['0']['left']) - (self.figure_objects[possible_answer]['0']['right'] - self.figure_objects[possible_answer]['0']['left']))
-                return min(r_difference.items(), key=lambda x: x[1])[0]
+                if len(r_difference) != 0:
+                    return min(r_difference.items(), key=lambda x: x[1])[0]
+                else:
+                    return -1
         else:
             return -1
 
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
-        if 'C-' in problem.name or 'B-' in problem.name:
+        if 'B-' in problem.name or 'C-' in problem.name:
             return -1
         self.initialize(problem)
         for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third, self.method_special_case_in_change_of_area, self.method_ugly_number_of_objects]:
