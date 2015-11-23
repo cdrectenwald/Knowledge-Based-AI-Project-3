@@ -103,6 +103,9 @@ class Agent:
                 current_y = center_y
                 while True:
                     current_x += 1
+                    if current_x > 184:
+                        this_object['shape'] = 'unknown'
+                        break
                     if (this_object['fill'] == 'no' and (current_y, current_x) in this_object['pixel_location'] and self.figure_pixel_matrix[figure_name][current_y][current_x] != status_of_center) \
                             or (this_object['fill'] == 'yes' and (current_y, current_x) not in this_object['pixel_location']):
                         break
@@ -111,7 +114,9 @@ class Agent:
                             or (this_object['fill'] == 'yes' and (current_y, current_x) not in this_object['pixel_location']):
                         break
                 r = (this_object['right'] - this_object['left']) / 2
-                if 0.4 < (current_x - center_x) / r < 0.6:
+                if r == 0:
+                    this_object['shape'] = 'unknown'
+                elif 0.4 < (current_x - center_x) / r < 0.6:
                     this_object['shape'] = 'diamond'
                 elif 0.6 <= (current_x - center_x) / r <= 0.8:
                     this_object['shape'] = 'circle'
@@ -314,6 +319,15 @@ class Agent:
                 if len(self.figure_objects['B']) == len(self.figure_objects['F']) == len(self.figure_objects['G']):
                     number_of_objects_diagonal_3 = len(self.figure_objects['B'])
         if not (number_of_objects_diagonal_1 == number_of_objects_diagonal_2 == number_of_objects_diagonal_3) and number_of_objects_diagonal_1 != 0 and number_of_objects_diagonal_2 != 0 and number_of_objects_diagonal_3 != 0:
+            # by area
+            if self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('A') / len(self.figure_objects['A']), self.calculate_sum_of_area_in_figure('F') / len(self.figure_objects['F'])) < 0.15 and \
+               self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('A') / len(self.figure_objects['A']), self.calculate_sum_of_area_in_figure('H') / len(self.figure_objects['H'])) < 0.15:
+                area_difference = {}
+                for possible_answer in [x for x in ['1', '2', '3', '4', '5', '6', '7', '8'] if len(self.figure_objects[x]) == number_of_objects_diagonal_1]:
+                    area_difference[possible_answer] = self.similarity_of_two_number(self.calculate_sum_of_area_in_figure('D') / len(self.figure_objects['D']), self.calculate_sum_of_area_in_figure(possible_answer) / len(self.figure_objects[possible_answer]))
+                if min(area_difference.items(), key=lambda x: x[1])[1] < 0.1:
+                    return min(area_difference.items(), key=lambda x: x[1])[0]
+            # by shape
             same_shape = []
             for possible_answer in [x for x in ['1', '2', '3', '4', '5', '6', '7', '8'] if len(self.figure_objects[x]) == number_of_objects_diagonal_1]:
                 if self.figure_objects['A']['0']['shape'] != self.figure_objects['E']['0']['shape']:
