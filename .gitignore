@@ -183,6 +183,13 @@ crashlytics-build.properties
 # sftp configuration file
 sftp-config.json
 
+### Vim ###
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
 
 ### Project related ###
 *.csv
