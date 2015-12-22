@@ -380,7 +380,7 @@ class Agent:
 
     # noinspection PyPep8Naming
     def Solve(self, problem: RavensProblem):
-        if 'B-' in problem.name or 'C-' in problem.name:
+        if 'B-' in problem.name or 'C-' in problem.name or 'Challenge' in problem.name:
             return -1
         self.initialize(problem)
         for possible_method in [self.method_unchanged, self.parse_objects_in_figures, self.method_xor_two_to_get_third, self.method_and_two_to_get_third, self.method_merge_two_to_get_third, self.method_simple_iterate, self.method_merge_row, self.method_change_of_area_to_get_third, self.method_simpler_change_of_area_to_get_third, self.method_special_case_in_change_of_area, self.method_ugly_number_of_objects]:

@@ -1,0 +1,15 @@
+sudo: required
+dist: trusty
+
+language: python
+
+python:
+  - 3.4
+  - 3.5
+
+install:
+  - pip install Pillow
+
+script:
+  - python RavensProject.py
+  - cat SetResults.csv
